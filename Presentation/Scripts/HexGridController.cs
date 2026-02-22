@@ -15,7 +15,7 @@ public partial class HexGridController : Node
     public override void _Ready()
     {
         _tileMap = GetNode<TileMapLayer>("HexTileMap");
-        _grid = new HexGrid(10, 20);
+        _grid = new HexGrid(120, 120);
         RenderAllTiles();
     }
 
@@ -31,17 +31,13 @@ public partial class HexGridController : Node
 
     private void RenderTile(HexTile tile)
     {
-        GameLogger.Info($"Passed tile: {tile}");
         Vector2I coords = new(tile.Position.Q, tile.Position.R);
-        GameLogger.Info($"Coords: {coords}");
 
         _tileMap.SetCell(
             coords: coords,
             sourceId: 1,
             atlasCoords: new Vector2I(_random.Next(3), _random.Next(2))
         );
-
-        GameLogger.Info($"Cell with cords: {tile.Position.Q},{tile.Position.R} created");
     }
 
 
