@@ -15,6 +15,10 @@ run/main_scene="uid://c4ii63ca4nml2"
 config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 boot_splash/show_image=false
 
+[display]
+
+window/stretch/mode="canvas_items"
+
 [dotnet]
 
 project/assembly_name="TBS"
