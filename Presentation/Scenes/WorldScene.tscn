@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://vfan4gf4jjhr" path="res://Assets/SpriteTiles7.png" id="1_yd6dh"]
 [ext_resource type="Script" uid="uid://d2x4d4l6hno5v" path="res://Presentation/Scripts/HexGridController.cs" id="2_cu3oa"]
+[ext_resource type="Script" uid="uid://c6majnsgc6ftd" path="res://Presentation/Scripts/CameraController.cs" id="3_cu3oa"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_sk2y2"]
 texture = ExtResource("1_yd6dh")
@@ -23,13 +24,14 @@ sources/1 = SubResource("TileSetAtlasSource_sk2y2")
 
 [node name="WorldScene" type="Node2D" unique_id=1128406733]
 
-[node name="HexGridController" type="Node2D" parent="." unique_id=1637684201]
+[node name="HexGridController" type="Node" parent="." unique_id=630548611]
 script = ExtResource("2_cu3oa")
 
 [node name="HexTileMap" type="TileMapLayer" parent="HexGridController" unique_id=1847647667]
 tile_set = SubResource("TileSet_rtcv5")
 
 [node name="CameraController" type="Node" parent="." unique_id=1018775299]
+script = ExtResource("3_cu3oa")
 
 [node name="Camera2D" type="Camera2D" parent="CameraController" unique_id=608623540]
 offset = Vector2(5, 5)
