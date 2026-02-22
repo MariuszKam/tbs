@@ -1,7 +1,9 @@
 using System;
 using Godot;
 using TBS.Domain.Hex;
-using TBS.Utils;
+using TBS.Infrastructure.Logging;
+
+namespace TBS.Presentation.Scripts;
 
 public partial class HexGridController : Node2D
 {

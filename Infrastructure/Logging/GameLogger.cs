@@ -1,7 +1,7 @@
 ﻿using System;
 using Godot;
 
-namespace TBS.Utils;
+namespace TBS.Infrastructure.Logging;
 
 public static class GameLogger
 {
