@@ -2,40 +2,54 @@
 
 namespace TBS.Domain.Hex;
 
-public sealed class HexGrid(int width, int height)
+public sealed class HexGrid
 {
-    
-    //Constant just for test and beginning
-    public int Width { get; } = width;
-    public int Height { get; }= height;
-    //Six directions
-    private static readonly (int dq, int dr)[] Directions =
-    [
-        ( 1,  0),
-        (-1,  0),
-        ( 0,  1),
-        ( 0, -1),
-        ( 1, -1),
-        (-1,  1)
-    ];
+    public int Width { get; }
+    public int Height { get; }
+    private readonly Dictionary<Hex, HexTile> _tiles = new();
 
-    private bool IsInside(Hex hex)
+    public HexGrid(int width, int height)
     {
-        return hex.Q >= 0 &&
-               hex.R >= 0 &&
-               hex.Q < Width &&
-               hex.R < Height;
+        Width = width;
+        Height = height;
+
+        GenerateGrid();
     }
 
-    public IEnumerable<Hex> GetNeighbours(Hex hex)
+    private void GenerateGrid()
     {
-        foreach (var (dq, dr) in Directions)
+        for (int q = 0; q < Width; q++)
         {
-            var candidate = new Hex(hex.Q + dq, hex.R + dr);
-
-            if (IsInside(candidate))
-                yield return candidate;
+            for (int r = 0; r < Height; r++)
+            {
+                var hex = new Hex(q, r);
+                _tiles[hex] = new HexTile(hex, true);
+            }
         }
     }
+
+    public HexTile? GetTile(Hex hex)
+    {
+        _tiles.TryGetValue(hex, out var tile);
+        return tile;
+    }
     
+    public IEnumerable<HexTile> GetAllTiles()
+    {
+        return _tiles.Values;
+    }
+
+    public bool ToggleWalkable(Hex hex)
+    {
+        return _tiles.TryGetValue(hex, out var tile) && tile.ToggleWalkable();
+    }
+
+    public IEnumerable<HexTile> GetNeighbours(Hex hex)
+    {
+        foreach (var neighbour in hex.Neighbours())
+        {
+            if (_tiles.TryGetValue(neighbour, out var tile))
+                yield return tile;
+        }
+    }
 }
