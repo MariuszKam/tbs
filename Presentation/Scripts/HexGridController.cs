@@ -5,7 +5,7 @@ using TBS.Infrastructure.Logging;
 
 namespace TBS.Presentation.Scripts;
 
-public partial class HexGridController : Node2D
+public partial class HexGridController : Node
 {
 	private HexGrid _grid;
 	
@@ -59,7 +59,7 @@ public partial class HexGridController : Node2D
 		{
 			if (mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left)
 			{
-				Vector2 global = GetGlobalMousePosition();
+				Vector2 global = GetViewport().GetMousePosition();
 				Vector2 local = _tileMap.ToLocal(global);
 				Vector2I coords = _tileMap.LocalToMap(local);
 
