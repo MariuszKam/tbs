@@ -16,38 +16,48 @@ public partial class HexGridController : Node2D
 
 	public override void _Ready()
 	{
+		_tileMap = GetNode<TileMapLayer>("../TileMapLayer");
 		_grid = new HexGrid(10, 20);
-		GenerateMap();
+		RenderAllTiles();
+	}
+	
+	private void RenderAllTiles()
+	{
+		foreach (var tile in _grid.GetAllTiles())
+		{
+			RenderTile(tile);
+		}
+		GameLogger.Info($"All tiles: {_grid.GetAllTiles()}");
+	}
+	
+	private void RenderTile(HexTile tile)
+	{
+		GameLogger.Info($"Passed tile: {tile}");
+		Vector2I coords = new(tile.Position.Q, tile.Position.R);
+		GameLogger.Info($"Coords: {coords}");
+
+		_tileMap.SetCell(
+			coords: coords,
+			sourceId: 1,
+			atlasCoords: new Vector2I(_random.Next(3), _random.Next(2))
+		);
+		
+		GameLogger.Info($"Cell with cords: {tile.Position.Q},{tile.Position.R} created");
 	}
 
-	private void GenerateMap()
-	{
-		for (int q = 0; q < _grid.Width; q++)
-		{
-			for (int r = 0; r < _grid.Height; r++)
-			{
-				_tileMap.SetCell(
-					coords: new Vector2I(q, r),
-					sourceId: 1,
-					atlasCoords: new Vector2I(_random.Next(4), _random.Next(2))
-				);
-				GameLogger.Info($"Cell with cords: {q},{r} created");
-			}
-		}
-		GameLogger.Info($"Map generated with {_grid.Width}x{_grid.Height}");
-	}
+	
 
 	public override void _Input(InputEvent @event)
 	{
-		if (@event is InputEventMouseButton mouseButton && mouseButton.Pressed)
+		if (@event is InputEventMouseButton mouseButton 
+		    && mouseButton.Pressed 
+		    && mouseButton.ButtonIndex == MouseButton.Left)
 		{
-			Vector2 globalMousePosition = GetGlobalMousePosition();
-			Vector2 localPosition = _tileMap.ToLocal(globalMousePosition);
-			Vector2I coords = _tileMap.LocalToMap(localPosition);
-			
-			Hex hex = new Hex(coords.X, coords.Y);
-			GameLogger.Info($"Clicked on {hex.Q}, {hex.R}");
-			
+			Vector2 global = GetGlobalMousePosition();
+			Vector2 local = _tileMap.ToLocal(global);
+			Vector2I coords = _tileMap.LocalToMap(local);
+
+			GameLogger.Info($"Cords of tile clicked: {coords.X},{coords.Y}");
 		}
 	}
 }
