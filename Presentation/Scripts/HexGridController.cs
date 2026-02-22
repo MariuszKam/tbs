@@ -11,12 +11,18 @@ public partial class HexGridController : Node2D
 	
 	private Random _random = new Random();
 	
+	private Camera2D _camera;
+
+	private bool _isDragging = false;
+	private Vector2 _lastMousePosition;
+	
 
 	[Export] private TileMapLayer _tileMap;
 
 	public override void _Ready()
 	{
 		_tileMap = GetNode<TileMapLayer>("../TileMapLayer");
+		_camera = GetNode<Camera2D>("../Camera2D");
 		_grid = new HexGrid(10, 20);
 		RenderAllTiles();
 	}
@@ -49,15 +55,33 @@ public partial class HexGridController : Node2D
 
 	public override void _Input(InputEvent @event)
 	{
-		if (@event is InputEventMouseButton mouseButton 
-		    && mouseButton.Pressed 
-		    && mouseButton.ButtonIndex == MouseButton.Left)
+		if (@event is InputEventMouseButton mouseButton)
 		{
-			Vector2 global = GetGlobalMousePosition();
-			Vector2 local = _tileMap.ToLocal(global);
-			Vector2I coords = _tileMap.LocalToMap(local);
+			if (mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left)
+			{
+				Vector2 global = GetGlobalMousePosition();
+				Vector2 local = _tileMap.ToLocal(global);
+				Vector2I coords = _tileMap.LocalToMap(local);
 
-			GameLogger.Info($"Cords of tile clicked: {coords.X},{coords.Y}");
+				GameLogger.Info($"Cords of tile clicked: {coords.X},{coords.Y}");
+			}
+			
+			_isDragging = mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left;
+			_lastMousePosition = mouseButton.Position;
+			
 		}
+		
+		if (@event is InputEventMouseMotion motion && _isDragging)
+		{
+			Vector2 delta = motion.Position - _lastMousePosition;
+
+			_camera.Position -= delta;
+
+			_lastMousePosition = motion.Position;
+		}
+		
+		
 	}
+	
+	
 }
