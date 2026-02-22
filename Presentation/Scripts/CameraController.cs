@@ -15,6 +15,10 @@ public partial class CameraController : Node
     private bool _isDragging = false;
     private Vector2 _dragStartMousePosition;
     private Vector2 _dragStartCameraPosition;
+    
+    [Export] private float _zoomSpeed = 0.1f;
+    [Export] private float _minZoom = 0.5f;
+    [Export] private float _maxZoom = 1.0f;
 
     [Export] private Camera2D _camera2D;
 
@@ -24,12 +28,12 @@ public partial class CameraController : Node
         GameLogger.Info($"Camera mode: {_cameraMode}");
     }
 
-    public override void _UnhandledInput(InputEvent @event)
+    public override void _Input(InputEvent @event)
     {
         if (_cameraMode != CameraMode.Free)
             return;
 
-        // START / STOP DRAG
+        // DRAG BUTTON
         if (@event is InputEventMouseButton mouseButtonEvent)
         {
             if (mouseButtonEvent.ButtonIndex == MouseButton.Right)
@@ -39,24 +43,38 @@ public partial class CameraController : Node
                     _isDragging = true;
                     _dragStartMousePosition = mouseButtonEvent.Position;
                     _dragStartCameraPosition = _camera2D.Position;
-                    GameLogger.Info($"Dragging camera {_dragStartCameraPosition} to {_dragStartMousePosition}");
                 }
                 else
                 {
                     _isDragging = false;
                 }
             }
+
+            // ZOOM
+            if (mouseButtonEvent.Pressed)
+            {
+                if (mouseButtonEvent.ButtonIndex == MouseButton.WheelUp)
+                    Zoom(_zoomSpeed);
+
+                if (mouseButtonEvent.ButtonIndex == MouseButton.WheelDown)
+                    Zoom(-_zoomSpeed);
+            }
         }
 
         // DRAG MOVEMENT
-        if (@event is InputEventMouseMotion mouseMotionEvent)
+        if (@event is InputEventMouseMotion mouseMotionEvent && _isDragging)
         {
-            if (_isDragging)
-            {
-                Vector2 mouseDelta = mouseMotionEvent.Position - _dragStartMousePosition;
-
-                _camera2D.Position = _dragStartCameraPosition - mouseDelta;
-            }
+            Vector2 mouseDelta = mouseMotionEvent.Position - _dragStartMousePosition;
+            _camera2D.Position = _dragStartCameraPosition - mouseDelta;
         }
+    }
+
+    private void Zoom(float amount)
+    {
+        Vector2 newZoom = _camera2D.Zoom + new Vector2(amount, amount);
+
+        float clamped = Mathf.Clamp(newZoom.X, _minZoom, _maxZoom);
+        
+        _camera2D.Zoom = new Vector2(clamped, clamped);
     }
 }
