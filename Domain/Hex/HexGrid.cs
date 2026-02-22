@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TBS.Hex;
+namespace TBS.Domain.Hex;
 
 public sealed class HexGrid(int width, int height)
 {
