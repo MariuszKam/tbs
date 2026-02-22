@@ -1,12 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 
-namespace TBS.Hex;
+namespace TBS.Domain.Hex;
 
-public sealed class Hex(int q, int r) : IEquatable<Hex>
+public readonly record struct Hex(int Q, int R)
 {
-    public int Q { get; } = q;
-    public int R { get; } = r;
+    private static readonly (int dq, int dr)[] Directions =
+    [
+        ( 1,  0),
+        (-1,  0),
+        ( 0,  1),
+        ( 0, -1),
+        ( 1, -1),
+        (-1,  1)
+    ];
 
+    public IEnumerable<Hex> Neighbours()
+    {
+        foreach (var (dq, dr) in Directions)
+            yield return new Hex(Q + dq, R + dr);
+    }
     
     public int DistanceTo(Hex other)
     {
@@ -15,22 +28,5 @@ public sealed class Hex(int q, int r) : IEquatable<Hex>
         int ds = (-Q - R) - (-other.Q - other.R);
 
         return (Math.Abs(dq) + Math.Abs(dr) + Math.Abs(ds)) / 2;
-    }
-    
-    public bool Equals(Hex other)
-    {
-        if (other is null) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return Q == other.Q && R == other.R;
-    }
-
-    public override bool Equals(object obj)
-    {
-        return ReferenceEquals(this, obj) || obj is Hex other && Equals(other);
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Q, R);
     }
 }

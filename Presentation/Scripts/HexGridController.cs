@@ -1,51 +1,61 @@
 using System;
 using Godot;
-using TBS.Hex;
-using TBS.Utils;
+using TBS.Domain.Hex;
+using TBS.Infrastructure.Logging;
 
-public partial class HexGridController : Node2D
+namespace TBS.Presentation.Scripts;
+
+public partial class HexGridController : Node
 {
-	private HexGrid _grid;
-	
-	private Random _random = new Random();
-	
+    private HexGrid _grid;
+    private Random _random = new Random();
 
-	[Export] private TileMapLayer _tileMap;
+    [Export] private TileMapLayer _tileMap;
 
-	public override void _Ready()
-	{
-		_grid = new HexGrid(10, 20);
-		GenerateMap();
-	}
+    public override void _Ready()
+    {
+        _tileMap = GetNode<TileMapLayer>("HexTileMap");
+        _grid = new HexGrid(10, 20);
+        RenderAllTiles();
+    }
 
-	private void GenerateMap()
-	{
-		for (int q = 0; q < _grid.Width; q++)
-		{
-			for (int r = 0; r < _grid.Height; r++)
-			{
-				_tileMap.SetCell(
-					coords: new Vector2I(q, r),
-					sourceId: 1,
-					atlasCoords: new Vector2I(_random.Next(4), _random.Next(2))
-				);
-				GameLogger.Info($"Cell with cords: {q},{r} created");
-			}
-		}
-		GameLogger.Info($"Map generated with {_grid.Width}x{_grid.Height}");
-	}
+    private void RenderAllTiles()
+    {
+        foreach (var tile in _grid.GetAllTiles())
+        {
+            RenderTile(tile);
+        }
 
-	public override void _Input(InputEvent @event)
-	{
-		if (@event is InputEventMouseButton mouseButton && mouseButton.Pressed)
-		{
-			Vector2 globalMousePosition = GetGlobalMousePosition();
-			Vector2 localPosition = _tileMap.ToLocal(globalMousePosition);
-			Vector2I coords = _tileMap.LocalToMap(localPosition);
-			
-			Hex hex = new Hex(coords.X, coords.Y);
-			GameLogger.Info($"Clicked on {hex.Q}, {hex.R}");
-			
-		}
-	}
+        GameLogger.Info($"All tiles: {_grid.GetAllTiles()}");
+    }
+
+    private void RenderTile(HexTile tile)
+    {
+        GameLogger.Info($"Passed tile: {tile}");
+        Vector2I coords = new(tile.Position.Q, tile.Position.R);
+        GameLogger.Info($"Coords: {coords}");
+
+        _tileMap.SetCell(
+            coords: coords,
+            sourceId: 1,
+            atlasCoords: new Vector2I(_random.Next(3), _random.Next(2))
+        );
+
+        GameLogger.Info($"Cell with cords: {tile.Position.Q},{tile.Position.R} created");
+    }
+
+
+    public override void _Input(InputEvent @event)
+    {
+        if (@event is InputEventMouseButton mouseButton)
+        {
+            if (mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left)
+            {
+                Vector2 world = _tileMap.GetGlobalMousePosition();
+                Vector2I coords = _tileMap.LocalToMap(_tileMap.ToLocal(world));
+
+                GameLogger.Info($"Cords of tile clicked: {coords.X},{coords.Y}");
+            }
+        }
+    }
 }
