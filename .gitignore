@@ -1,0 +1,20 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+*.uid
+*.import
+*.DotSettings.user
+# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/projectSettingsUpdater.xml
+/contentModel.xml
+/.idea.TBS.iml
+/modules.xml
+bin/
+obj/
+.mono/
+.idea/
+.DS_Store
+Thumbs.db
